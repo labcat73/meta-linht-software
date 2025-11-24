@@ -13,7 +13,7 @@ inherit systemd
 DEPENDS = "libgpiod libpredict libsx1255 zeromq liblinht-ctrl alsa-lib libgpiod raylib cyaml"
 RDEPENDS:${PN} = "bash libgpiod libpredict libsx1255 zeromq liblinht-ctrl alsa-lib libgpiod raylib cyaml"
 
-SYSTEMD_SERVICE:${PN} = "volume-ctrl.service zmq-proxy.service gui-test.service first-boot.service"  
+SYSTEMD_SERVICE:${PN} = "linht-volume-ctrl.service linht-zmq-proxy.service linht-gui-test.service linht-first-boot.service"  
 SYSTEMD_AUTO_ENABLE = "enable"
 
 EXTRA_OEMAKE = ""
@@ -43,38 +43,47 @@ do_compile() {
 }
 
 do_install() {
+     # install script
+     install -Dm 0755 ${WORKDIR}/linht-first-boot.sh ${D}${bindir}/linht-first-boot.sh
 
-    # install script
-    install -Dm 0755 ${WORKDIR}/firstboot.sh ${D}${bindir}/firstboot.sh
+     install -d ${D}${bindir}
 
-    install -d ${D}${bindir}
-    install -m 0755 ${S}/sx1255/sx1255-spi      ${D}${bindir}/
-    install -m 0755 ${S}/tests/fb_test/fb_test  ${D}${bindir}/
-    install -m 0755 ${S}/scripts/volume_ctrl.sh ${D}${bindir}/
-    install -m 0755 ${S}/tests/zmq_proxy/zmq_proxy ${D}${bindir}/
-    install -m 0755 ${S}/tests/gui_test/gui_test   ${D}${bindir}/              
+     # Install programs with original names
+     install -m 0755 ${S}/sx1255/sx1255-spi      ${D}${bindir}/
+     install -m 0755 ${S}/tests/fb_test/fb_test  ${D}${bindir}/
+     install -m 0755 ${S}/scripts/volume_ctrl.sh ${D}${bindir}/
+     install -m 0755 ${S}/tests/zmq_proxy/zmq_proxy ${D}${bindir}/
+     install -m 0755 ${S}/tests/gui_test/gui_test   ${D}${bindir}/
 
-    install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/first-boot.service  ${D}${systemd_unitdir}/system/
-    install -m 0644 ${WORKDIR}/volume-ctrl.service ${D}${systemd_unitdir}/system/
-    install -m 0644 ${WORKDIR}/zmq-proxy.service   ${D}${systemd_unitdir}/system/
-    install -m 0644 ${WORKDIR}/gui-test.service       ${D}${systemd_unitdir}/system/ 
+     # Create symlinks with linht- prefix
+     ln -sf sx1255-spi  ${D}${bindir}/linht-sx1255-spi
+     ln -sf fb_test     ${D}${bindir}/linht-fb_test
+     ln -sf volume_ctrl.sh ${D}${bindir}/linht-volume_ctrl.sh
+     ln -sf zmq_proxy   ${D}${bindir}/linht-zmq_proxy
+     ln -sf gui_test    ${D}${bindir}/linht-gui_test
 
-    # Full source tree for on-device inspection
-    install -d ${D}/root/LinHT-utils
-    cp -R ${S}/* ${D}/root/LinHT-utils/
+     # Install systemd service files
+     install -d ${D}${systemd_unitdir}/system
+     install -m 0644 ${WORKDIR}/linht-first-boot.service  ${D}${systemd_unitdir}/system/
+     install -m 0644 ${WORKDIR}/linht-volume-ctrl.service ${D}${systemd_unitdir}/system/
+     install -m 0644 ${WORKDIR}/linht-zmq-proxy.service   ${D}${systemd_unitdir}/system/
+     install -m 0644 ${WORKDIR}/linht-gui-test.service    ${D}${systemd_unitdir}/system/ 
+
+     # Full source tree for on-device inspection
+     install -d ${D}/root/LinHT-utils
+     cp -R ${S}/* ${D}/root/LinHT-utils/
 }
 
 FILES:${PN} += "/root/LinHT-utils \
-                ${systemd_unitdir}/system/first-boot.service \
-                ${systemd_unitdir}/system/volume-ctrl.service \
-                ${systemd_unitdir}/system/zmq-proxy.service \
-                ${systemd_unitdir}/system/gui-test.service"               
+                ${systemd_unitdir}/system/linht-first-boot.service \
+                ${systemd_unitdir}/system/linht-volume-ctrl.service \
+                ${systemd_unitdir}/system/linht-zmq-proxy.service \
+                ${systemd_unitdir}/system/linht-gui-test.service"               
 
 INSANE_SKIP:${PN} = "already-stripped dev-so ldflags file-rdeps"
 
-SRC_URI += "file://firstboot.sh \
-            file://first-boot.service \
-            file://volume-ctrl.service \
-            file://zmq-proxy.service \
-            file://gui-test.service"                                     
+SRC_URI += "file://linht-first-boot.sh \
+            file://linht-first-boot.service \
+            file://linht-volume-ctrl.service \
+            file://linht-zmq-proxy.service \
+            file://linht-gui-test.service"                                     

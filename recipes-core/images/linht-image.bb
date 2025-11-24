@@ -61,6 +61,7 @@ IMAGE_INSTALL += "\
     sox \
     packagegroup-container \
     m17-packet \
+    fbida \
 "
 
 IMAGE_INSTALL:append = " \

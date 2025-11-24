@@ -1,11 +1,9 @@
 [Unit]
-Description=GUI Test
-After=multi-user.target
-Wants=multi-user.target
+Description=LinHT ZMQ proxy
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/gui_test
+ExecStart=/usr/bin/zmq_proxy
 Restart=on-failure
 RestartSec=5s
 User=root

@@ -1,12 +1,11 @@
 [Unit]  
 Description=First-boot setup  
-Before=multi-user.target  
 
 [Service]  
 Type=oneshot  
 RemainAfterExit=yes  
-ExecStart=/usr/bin/firstboot.sh  
-ExecStartPost=/bin/systemctl disable first-boot.service  
+ExecStart=/usr/bin/linht-first-boot.sh  
+ExecStartPost=/bin/systemctl disable linht-first-boot.service  
 StandardOutput=journal+console  
 
 [Install]
