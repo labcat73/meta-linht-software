@@ -113,6 +113,8 @@ IMAGE_INSTALL += "\
     libsndfile1-dev \
     liblinht-ctrl \
     liblinht-ctrl-dev \
+    soapyremote \
+    soapyaudio \
     zeromq \
     zeromq-dev \
 "
